@@ -1,0 +1,12 @@
+## Este archivo .gitignore hace que GitHub ignore los siguientes archivos para
+## no subirlos al repositorio para cuando hagamos cambios.
+
+# Entorno virtual
+.venv
+
+# Cache de Python
+__pycache__/
+*.pyc
+
+# Archivos del sistema
+.DS_Store
