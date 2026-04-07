@@ -31,20 +31,20 @@ Necesitás tener instalado el intérprete de [Python](https://www.python.org/dow
 
 Seguí estos pasos para ejecutar la API en tu entorno local:
 
-1.  **Cloná este repositorio** (o descargá los archivos en una carpeta):
-    *Clonamos el repositorio:*
-    `git clone git@github.com:keytapia/TP2ids.git`
-    *Accedemos a la carpeta:*
-    `cd TP2ids`
-2.  **Creá un entorno virtual**:
-    *Creamos el entorno virtual venv en una carpeta oculta llamada "venv":*
-    `python -m venv .venv`
-    *Activamos el entorno virtual:*
-    - En Windows: `.venv\Scripts\activate`
-    - En macOS/Linux: `source .venv/bin/activate`
-3.  **Instalá las dependencias**:
-    *Con este comando instalamos lo que se detalla dentro del archivo requirements.txt*
-    `pip install -r requirements.txt`
+1.  **Cloná este repositorio** (o descargá los archivos en una carpeta):  
+    *Clonamos el repositorio:*  
+    `git clone git@github.com:keytapia/TP2ids.git`  
+    *Accedemos a la carpeta:*  
+    `cd TP2ids`  
+2.  **Creá un entorno virtual**:  
+    *Creamos el entorno virtual venv en una carpeta oculta llamada "venv":*  
+    `python -m venv .venv`  
+    *Activamos el entorno virtual:*  
+    - En Windows: `.venv\Scripts\activate`  
+    - En macOS/Linux: `source .venv/bin/activate`  
+3.  **Instalá las dependencias**:  
+    *Con este comando instalamos lo que se detalla dentro del archivo requirements.txt*  
+    `pip install -r requirements.txt`  
 
 
 ## Cómo ejecutar la API
