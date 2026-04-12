@@ -1,188 +1,667 @@
-asyncapi: '2.6.0'
+openapi: 3.0.0
 info:
-  title: Streetlights Kafka API
-  version: '1.0.0'
-  description: |
-    The Smartylighting Streetlights API allows you to remotely manage the city lights.
-
-    ### Check out its awesome features:
-
-    * Turn a specific streetlight on/off 🌃
-    * Dim a specific streetlight 😎
-    * Receive real-time information about environmental lighting conditions 📈
-  license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0
-
-servers:
-  scram-connections:
-    url: test.mykafkacluster.org:18092
-    protocol: kafka-secure
-    description: Test broker secured with scramSha256
-    security:
-      - saslScram: []
-    tags:
-      - name: "env:test-scram"
-        description: "This environment is meant for running internal tests through scramSha256"
-      - name: "kind:remote"
-        description: "This server is a remote server. Not exposed by the application"
-      - name: "visibility:private"
-        description: "This resource is private and only available to certain users"
-  mtls-connections:
-    url: test.mykafkacluster.org:28092
-    protocol: kafka-secure
-    description: Test broker secured with X509
-    security:
-      - certs: []
-    tags:
-      - name: "env:test-mtls"
-        description: "This environment is meant for running internal tests through mtls"
-      - name: "kind:remote"
-        description: "This server is a remote server. Not exposed by the application"
-      - name: "visibility:private"
-        description: "This resource is private and only available to certain users"
-
-defaultContentType: application/json
-
-channels:
-  smartylighting.streetlights.1.0.event.{streetlightId}.lighting.measured:
-    description: The topic on which measured values may be produced and consumed.
+  title: API de Fixture
+  description: API para gestionar partidos con soporte para paginación y fases del torneo.
+  version: 1.0.0
+paths:
+  /partidos:
+    get:
+      summary: "Listar partidos (sin resultados incluidos)"
+      tags:
+        - Partidos
+      parameters:
+        - $ref: '#/components/parameters/Equipo'
+        - $ref: '#/components/parameters/Fecha'
+        - $ref: '#/components/parameters/FaseParam'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPartidoList200'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Crear partido"
+      tags:
+        - Partidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartidoBase'
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /partidos/{id}:
     parameters:
-      streetlightId:
-        $ref: '#/components/parameters/streetlightId'
-    publish:
-      summary: Inform about environmental lighting conditions of a particular streetlight.
-      operationId: receiveLightMeasurement
-      traits:
-        - $ref: '#/components/operationTraits/kafka'
-      message:
-        $ref: '#/components/messages/lightMeasured'
-
-  smartylighting.streetlights.1.0.action.{streetlightId}.turn.on:
+      - $ref: '#/components/parameters/IdPartido'
+    get:
+      summary: "Obtener un partido por ID"
+      tags:
+        - Partidos
+      responses:
+        '200':
+          description: Detalle del partido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partido'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: "Reemplazar un partido"
+      tags:
+        - Partidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartidoBase'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      summary: "Actualizar parcialmente un partido"
+      tags:
+        - Partidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartidoActualizacion'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar partido"
+      tags:
+        - Partidos
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /partidos/{id}/resultado:
     parameters:
-      streetlightId:
-        $ref: '#/components/parameters/streetlightId'
-    subscribe:
-      operationId: turnOn
-      traits:
-        - $ref: '#/components/operationTraits/kafka'
-      message:
-        $ref: '#/components/messages/turnOnOff'
-
-  smartylighting.streetlights.1.0.action.{streetlightId}.turn.off:
+      - $ref: '#/components/parameters/IdPartido'
+    put:
+      summary: "Actualizar resultado"
+      tags:
+        - Resultados
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resultado'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /partidos/{id}/prediccion:
     parameters:
-      streetlightId:
-        $ref: '#/components/parameters/streetlightId'
-    subscribe:
-      operationId: turnOff
-      traits:
-        - $ref: '#/components/operationTraits/kafka'
-      message:
-        $ref: '#/components/messages/turnOnOff'
-
-  smartylighting.streetlights.1.0.action.{streetlightId}.dim:
+      - $ref: '#/components/parameters/IdPartido'
+    post:
+      summary: "Registrar una predicción para un partido"
+      tags:
+        - Predicciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Prediccion'
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /usuarios:
+    get:
+      summary: "Listar usuarios"
+      tags:
+        - Usuarios
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetUsuarioList200'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Crear usuario"
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioBase'
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /usuarios/{id}:
     parameters:
-      streetlightId:
-        $ref: '#/components/parameters/streetlightId'
-    subscribe:
-      operationId: dimLight
-      traits:
-        - $ref: '#/components/operationTraits/kafka'
-      message:
-        $ref: '#/components/messages/dimLight'
-
+      - $ref: '#/components/parameters/IdUsuario'
+    get:
+      summary: "Obtener un usuario por ID"
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Detalle del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: "Reemplazar un usuario"
+      description: "Reemplaza todos los campos de un usuario existente. Si no existe, lo crea. Todos los campos son obligatorios."
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioBase'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar usuario"
+      tags:
+        - Usuarios
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /ranking:
+    get:
+      summary: "Obtener el ranking de usuarios"
+      tags:
+        - Ranking
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetRankingList200'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
-  messages:
-    lightMeasured:
-      name: lightMeasured
-      title: Light measured
-      summary: Inform about environmental lighting conditions of a particular streetlight.
-      contentType: application/json
-      traits:
-        - $ref: '#/components/messageTraits/commonHeaders'
-      payload:
-        $ref: "#/components/schemas/lightMeasuredPayload"
-    turnOnOff:
-      name: turnOnOff
-      title: Turn on/off
-      summary: Command a particular streetlight to turn the lights on or off.
-      traits:
-        - $ref: '#/components/messageTraits/commonHeaders'
-      payload:
-        $ref: "#/components/schemas/turnOnOffPayload"
-    dimLight:
-      name: dimLight
-      title: Dim light
-      summary: Command a particular streetlight to dim the lights.
-      traits:
-        - $ref: '#/components/messageTraits/commonHeaders'
-      payload:
-        $ref: "#/components/schemas/dimLightPayload"
-
   schemas:
-    lightMeasuredPayload:
-      type: object
+    Fase:
+      type: "string"
+      description: "Fase del torneo, del partido"
+      enum:
+        - grupos
+        - dieciseisavos
+        - octavos
+        - cuartos
+        - semis
+        - final
+      example: "GRUPOS"
+    Equipo:
+      type: "string"
+      description: "Nombre del equipo que juega en el partido"
+      example: "Argentina"
+    Fecha:
+      type: "string"
+      description: |-
+        Fecha en la que está programado el partido.
+
+        El valor usa el formato de fecha ISO 8601:
+
+        'YYYY-MM-DD'
+
+        Donde:
+        - YYYY: 4 dígitos para el año
+        - MM: 2 dígitos para el mes (por ejemplo, 01 = Enero)
+        - DD: 2 dígitos para el día del mes (01 al 31)
+      example: "2025-05-19"
+      format: "date-time"
+    PartidoListResponse:
+      type: "object"
+      description: "Respuesta a una solicitud para obtener una lista de partidos"
       properties:
-        lumens:
-          type: integer
-          minimum: 0
-          description: Light intensity measured in lumens.
-        sentAt:
-          $ref: "#/components/schemas/sentAt"
-    turnOnOffPayload:
-      type: object
+        partidos:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/PartidoResumen'
+        _links:
+          $ref: '#/components/schemas/Links'
+    PartidoResumen:
+      description: "Información esencial de un encuentro, sin incluir el resultado"
+      type: "object"
       properties:
-        command:
-          type: string
+        id:
+          type: "integer"
+          description: "ID de partido único"
+          example: 1
+        equipo_local:
+          $ref: '#/components/schemas/Equipo'
+        equipo_visitante:
+          $ref: '#/components/schemas/Equipo'
+        fecha:
+          $ref: '#/components/schemas/Fecha'
+        fase:
+          $ref: '#/components/schemas/Fase'
+    PartidoActualizacion:
+      type: "object"
+      description: "Campos opcionales para actualizar parcialmente un partido. Al menos uno debe estar presente."
+      properties:
+        equipo_local:
+          $ref: '#/components/schemas/Equipo'
+        equipo_visitante:
+          $ref: '#/components/schemas/Equipo'
+        fecha:
+          $ref: '#/components/schemas/Fecha'
+        fase:
+          $ref: '#/components/schemas/Fase'
+    PartidoBase:
+      type: "object"
+      description: "Datos mínimos necesarios para registrar un partido dentro del fixture"
+      required:
+        - equipo_local
+        - equipo_visitante
+        - fase
+        - fecha
+      properties:
+        equipo_local:
+          $ref: '#/components/schemas/Equipo'
+        equipo_visitante:
+          $ref: '#/components/schemas/Equipo'
+        fecha:
+          $ref: '#/components/schemas/Fecha'
+        fase:
+          $ref: '#/components/schemas/Fase'
+    Partido:
+      description: "Información completa de un encuentro dentro del fixture, incluyendo tanto los datos básicos como el resultado (cuando está disponible)"
+      allOf:
+        - $ref: '#/components/schemas/PartidoResumen'
+        - type: "object"
+          properties:
+            resultado:
+              $ref: '#/components/schemas/Resultado'
+    Resultado:
+      type: "object"
+      description: "Marcador final de un partido, con los goles anotados por cada equipo"
+      required:
+        - local
+        - visitante
+      properties:
+        local:
+          type: "integer"
+          description: "Número de goles convertidos por el equipo local en el partido"
+          example: 1
+        visitante:
+          type: "integer"
+          description: "Número de goles convertidos por el equipo visitante en el partido"
+          example: 2
+    UsuarioBase:
+      type: "object"
+      description: "Datos necesarios para crear o reemplazar un usuario"
+      required:
+        - nombre
+        - email
+      properties:
+        nombre:
+          type: "string"
+          description: "Nombre del usuario"
+          example: "Juan González"
+        email:
+          type: "string"
+          description: "Dirección de correo electrónico del usuario"
+          example: "juan@example.com"
+    UsuarioResumen:
+      type: "object"
+      description: "Información básica de un usuario, para el listado"
+      properties:
+        id:
+          type: "integer"
+          description: "ID de usuario único"
+          example: 1
+        nombre:
+          type: "string"
+          description: "Nombre del usuario"
+          example: "Juan González"
+    Usuario:
+      type: "object"
+      description: "Información completa de un usuario"
+      properties:
+        id:
+          type: "integer"
+          description: "ID de usuario único"
+          example: 1
+        nombre:
+          type: "string"
+          description: "Nombre del usuario"
+          example: "Juan González"
+        email:
+          type: "string"
+          description: "Dirección de correo electrónico del usuario"
+          example: "juan@example.com"
+    Prediccion:
+      type: "object"
+      description: "Predicción de resultado realizada por un usuario para un partido"
+      required:
+        - id_usuario
+        - local
+        - visitante
+      properties:
+        id_usuario:
+          type: "integer"
+          description: "ID del usuario que realiza la predicción"
+          example: 1
+        local:
+          type: "integer"
+          description: "Goles predichos para el equipo local"
+          example: 2
+        visitante:
+          type: "integer"
+          description: "Goles predichos para el equipo visitante"
+          example: 1
+    RankingItem:
+      type: "object"
+      description: "Posición de un usuario en el ranking"
+      properties:
+        id_usuario:
+          type: "integer"
+          description: "ID del usuario"
+          example: 1
+        puntos:
+          type: "integer"
+          description: "Puntos acumulados por el usuario"
+          example: 9
+    UsuarioListResponse:
+      type: "object"
+      description: "Respuesta a una solicitud para obtener una lista de usuarios"
+      properties:
+        usuarios:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/UsuarioResumen'
+        _links:
+          $ref: '#/components/schemas/Links'
+    RankingListResponse:
+      type: "object"
+      description: "Respuesta a una solicitud para obtener el ranking"
+      properties:
+        ranking:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/RankingItem'
+        _links:
+          $ref: '#/components/schemas/Links'
+    Errores:
+      type: "object"
+      properties:
+        errors:
+          type: "array"
+          description: "Listado de errores"
+          items:
+            $ref: "#/components/schemas/Error"
+    Error:
+      type: "object"
+      description: "Estructura de datos que contiene los detalles del error"
+      properties:
+        code:
+          type: "string"
+          description: "Código de error alfanumérico único legible por humanos"
+          example: "XXX"
+        message:
+          type: "string"
+          description: "Breve resumen del problema reportado"
+          example: "Mensaje"
+        level:
+          type: "string"
+          description: "Nivel del problema reportado"
+          example: "error"
           enum:
-            - on
-            - off
-          description: Whether to turn on or off the light.
-        sentAt:
-          $ref: "#/components/schemas/sentAt"
-    dimLightPayload:
-      type: object
+            - info
+            - warning
+            - error
+        description:
+          type: string
+          description: "Descripción detallada del problema reportado"
+          example: "Descripción"
+    Links:
+      type: "object"
+      description: "Estructura de datos que contiene los enlaces para navegar entre páginas"
       properties:
-        percentage:
-          type: integer
-          description: Percentage to which the light should be dimmed to.
-          minimum: 0
-          maximum: 100
-        sentAt:
-          $ref: "#/components/schemas/sentAt"
-    sentAt:
-      type: string
-      format: date-time
-      description: Date and time when the message was sent.
-
-  securitySchemes:
-    saslScram:
-      type: scramSha256
-      description: Provide your username and password for SASL/SCRAM authentication
-    certs:
-      type: X509
-      description: Download the certificate files from service provider
-
+        _first:
+          type: "object"
+          description: "Estructura de datos que contiene información de enlace"
+          properties:
+            href:
+              type: "string"
+              description: "Enlace de referencia que se puede usar para navegar a la URI especificada.\n\nEste enlace lleva a la primera página de la lista.\n\nEl valor exacto depende de los datos a los que se accede.\n\nEl contenido exacto de la página depende de los parámetros de entrada proporcionados en la solicitud, como el offset."
+              example: "https://www.hostname.com/prode_api?_offset=0&_limit=10"
+        _prev:
+          type: "object"
+          description: "Estructura de datos que contiene información de enlace"
+          properties:
+            href:
+              type: "string"
+              description: "Enlace de referencia que se puede usar para navegar a la URI especificada.\n\nEste enlace lleva a la página anterior de la lista.\n\nEl valor exacto depende de los datos a los que se accede.\n\nEl contenido exacto de la página depende de los parámetros de entrada proporcionados en la solicitud, como el offset."
+              example: "https://www.hostname.com/prode_api?_offset=0&_limit=10"
+        _next:
+          type: "object"
+          description: "Estructura de datos que contiene información de enlace"
+          properties:
+            href:
+              type: "string"
+              description: "Enlace de referencia que se puede usar para navegar a la URI especificada.\n\nEste enlace lleva a la siguiente página de la lista.\n\nEl valor exacto depende de los datos a los que se accede.\n\nEl contenido exacto de la página depende de los parámetros de entrada proporcionados en la solicitud, como el offset."
+              example: "https://www.hostname.com/prode_api?_offset=0&_limit=10"
+        _last:
+          type: "object"
+          description: "Estructura de datos que contiene información de enlace"
+          properties:
+            href:
+              type: "string"
+              description: "Enlace de referencia que se puede usar para navegar a la URI especificada.\n\nEste enlace lleva a la última página de la lista.\n\nEl valor exacto depende de los datos a los que se accede.\n\nEl contenido exacto de la página depende de los parámetros de entrada proporcionados en la solicitud, como el offset."
+              example: "https://www.hostname.com/prode_api?_offset=0&_limit=10"
   parameters:
-    streetlightId:
-      description: The ID of the streetlight.
+    IdPartido:
+      name: id
+      in: path
       schema:
-        type: string
+        type: "integer"
+      description: "ID de partido que se utilizará en la consulta"
+      required: true
+      example: 1
+    Equipo:
+      name: equipo
+      in: query
+      schema:
+        type: "string"
+      description: "Equipo que participa en el partido, ya sea como local o visitante"
+      required: false
+      example: "Argentina"
+    Fecha:
+      name: fecha
+      in: query
+      schema:
+        type: "string"
+        description: |-
+          Fecha en la que está programado el partido.
 
-  messageTraits:
-    commonHeaders:
-      headers:
-        type: object
-        properties:
-          my-app-header:
-            type: integer
-            minimum: 0
-            maximum: 100
+          El valor usa el formato de fecha ISO 8601:
 
-  operationTraits:
-    kafka:
-      bindings:
-        kafka:
-          clientId:
-            type: string
-            enum: ['my-app-id']
+          'YYYY-MM-DD'
+
+          Donde:
+          - YYYY: 4 dígitos para el año
+          - MM: 2 dígitos para el mes (por ejemplo, 01 = Enero)
+          - DD: 2 dígitos para el día del mes (01 al 31)
+        format: "date-time"
+      required: false
+      example: "2025-05-19"
+    FaseParam:
+      name: fase
+      in: query
+      schema:
+        $ref: '#/components/schemas/Fase'
+      required: false
+      example: "CUARTOS"
+    Limit:
+      name: _limit
+      in: query
+      schema:
+        type: "integer"
+        format: int32
+        minimum: 1
+      description: |-
+        Cantidad máxima de registros que se incluirán en cada página de la respuesta.
+
+        Pueden devolverse menos registros si la consulta no produce esa cantidad.
+
+        El valor por defecto es 10.
+      required: false
+      example: 10
+    Offset:
+      name: _offset
+      in: query
+      schema:
+        type: "integer"
+        pattern: "^[0-9]+$"
+        minimum: 0
+      description: |-
+        Identificador de paginación que es devuelto a la aplicación por la API cuando se utilizan los enlaces HATEOAS '_prev' o '_next'.
+
+        Si no se especifica un offset, la aplicación puede navegar desde la última página devuelta hacia la siguiente, la anterior o la primera.
+      required: false
+      example: 1
+    IdUsuario:
+      name: id
+      in: path
+      schema:
+        type: "integer"
+      description: "ID de usuario que se utilizará en la consulta"
+      required: true
+      example: 1
+  responses:
+    GetPartidoList200:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PartidoListResponse"
+    GetUsuarioList200:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UsuarioListResponse"
+    GetRankingList200:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RankingListResponse"
+    Created:
+      description: "Created"
+    NoContent:
+      description: "No Content"
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+    Conflict:
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+    InternalServerError:
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
