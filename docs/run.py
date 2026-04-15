@@ -1,5 +1,5 @@
 #para arrancar el servidor y visualizar en postman o navegador
-from app.app import create_app
+from TP2ids.docs.app.app import create_app
 
 app = create_app()
 
