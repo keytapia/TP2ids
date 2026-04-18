@@ -39,3 +39,6 @@ def crear_usuario(dato):
     email = dato.get('email')
     nuevo_usuario = db.crear(nombre, email)
     return nuevo_usuario, 201
+
+def obtener_usuario_por_id(id_buscado):
+    return usuario.query.get(id_buscado)

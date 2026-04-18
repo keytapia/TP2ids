@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint
-from app.services.usurios_service import crear_usuario
+from app.services.usurios_service import crear_usuario, obtener_usuario_por_id
 from app.db import db
 
 usuarios_bp = Blueprint("usuarios", __name__)
@@ -23,10 +23,22 @@ def crear_usuario():
         return jsonify(error)
     return jsonify(nuevo_usuario, 201)
 
+@usuarios_bp.route("/<int:id>", methods=["GET"])
+def get_usuario(id):
+    u = obtener_usuario_por_id(id)
 
+    if not u: 
+        return jsonify({ 
+            "errors": [{ 
+                "code": 404, 
+                "message": "Usuario no encontrado",
+                "level": "error",
+                "description": f"No existe un usuario con el ID {id}." 
+            }] 
+        }), 404
 
-
-
-
-
-
+    return jsonify({ 
+        "id": u.id, 
+        "nombre": u.nombre,
+        "email": u.email
+    }), 200
