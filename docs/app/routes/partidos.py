@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, Blueprint
 from app.services.partidos_service import crear_partido, obtener_partido_por_id
+from app.services.partidos_service import crear_partido, eliminar_partido #DELETE
 from app.db import db
 
 
@@ -48,3 +49,50 @@ def get_partido(id):
             "visitante": p.goles_visitante
         } if p.goles_local is not None else None
     }), 200
+
+
+"""DELETE"""
+
+@partidos_bp.route("/<int:id>", methods=["DELETE"])
+def delete_partido(id):
+    try:
+        if id <= 0:
+            return jsonify({
+                "errors": [
+                    {
+                        "code": 400,
+                        "message": "Id invalido",
+                        "level": "error",
+                        "description": "El id debe ser mayor a 0"
+                    }
+                ]
+            }), 400
+
+        eliminado = eliminar_partido(id)
+
+        if eliminado == 0:
+            return jsonify({
+                "errors": [
+                    {
+                        "code": 404,
+                        "message": "Partido no encontrado",
+                        "level": "error",
+                        "description": f"No existe un partido con id {id}"
+                    }
+                ]
+            }), 404
+
+        return "", 204
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "errors": [
+                {
+                    "code": 500,
+                    "message": "Error interno del servidor",
+                    "level": "error",
+                    "description": str(e)
+                }
+            ]
+        }), 500
