@@ -86,3 +86,5 @@ def crear_partido(dato):
     return nuevo_partido, 201
 
 
+def obtener_partido_por_id(id_buscado):
+    return partido.query.get(id_buscado)
