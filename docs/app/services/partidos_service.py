@@ -88,3 +88,15 @@ def crear_partido(dato):
 
 def obtener_partido_por_id(id_buscado):
     return partido.query.get(id_buscado)
+
+"""DELETE"""
+
+def eliminar_partido(id):
+    partido_encontrado=partido.query.get(id)
+    if not partido_encontrado:
+        return 0
+    
+    db.session.delete(partido_encontrado)
+    db.session.commit()
+
+    return 1
