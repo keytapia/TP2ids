@@ -7,33 +7,33 @@ import re
 def crear_usuario(dato):
 
     if not dato.get('nombre'):
-        return {
+        return [{
             'code': 400,
             'message': 'Faltan datos obligatorios',
             'level': 'error',
             'description': 'El campo "nombre" no fue completado y es obligatorio'
-        }
+        }]
     if not dato.get('email'):
-        return {
+        return [{
             'code': 400,
             'message': 'Faltan datos obligatorios',
             'level': 'error',
             'description': 'El campo "email" no fue completado y es obligatorio'
-        }
+        }]
     if usuario.query.filter_by(email=dato.get('email')).first():
-        return {
+        return [{
             'code': 409,
             'message': 'Este email ya esta siendo utilizado',
             'level': 'error',
             'description': 'Este email ya esta siendo utilizado'
-        }
+        }]
     if not re.match(r"[^@]+@[^@]+\.[^@]+", dato.get('email')):
-        return {
+        return [{
             'code': 400,
             'message': 'Email invalido',
             'level': 'error',
             'description': 'el formato de email es invalido'
-        }
+        }]
 
     nombre = dato.get('nombre')
     email = dato.get('email')
