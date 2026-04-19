@@ -1,11 +1,34 @@
+from flask import Blueprint, jsonify, request
 
-from flask import Blueprint, jsonify
-from app.services.usuarios_service import eliminar_usuario
 from app.db import db
+from app.services.usuarios_service import crear_usuario
+from app.services.usuarios_service import eliminar_usuario
+from app.services.usuarios_service import obtener_usuario_por_id
 
 usuarios_bp = Blueprint("usuarios", __name__)
 
-# BORRAR USUARIO
+
+# --------------------- CREAR USUARIO --------------------- #
+@usuarios_bp.route("/usuarios", methods=["POST"])
+def crear_usuario():
+    dato = request.get_json()
+    nuevo_usuario = crear_usuario(dato)
+    if "error" in nuevo_usuario:
+        error = {
+            "errors": [
+                {
+                    "code": nuevo_usuario.get("code.api"),
+                    "message": crear_usuario.get("error"),
+                    "level": "error",
+                    "descripcion": crear_usuario.get("description")
+                }
+            ]
+        }
+        return jsonify(error)
+    return jsonify(nuevo_usuario, 201)
+
+
+# --------------------- BORRAR USUARIO --------------------- #
 @usuarios_bp.route("/<int:id>", methods=["DELETE"])
 def delete_usuario(id):
     try:
@@ -54,26 +77,7 @@ def delete_usuario(id):
         return jsonify(error), 500
 
 
-# CREAR USUARIO
-@usuarios_bp.route("/usuarios", methods=["POST"])
-def crear_usuario():
-    dato = request.get_json()
-    nuevo_usuario = crear_usuario(dato)
-    if "error" in nuevo_usuario:
-        error = {
-            "errors": [
-                {
-                    "code": nuevo_usuario.get("code.api"),
-                    "message": crear_usuario.get("error"),
-                    "level": "error",
-                    "descripcion": crear_usuario.get("description")
-                }
-            ]
-        }
-        return jsonify(error)
-    return jsonify(nuevo_usuario, 201)
-
-# OBTENER USUARIO POR ID
+# --------------------- OBTENER USUARIO POR ID --------------------- #
 @usuarios_bp.route("/<int:id>", methods=["GET"])
 def get_usuario(id):
     u = obtener_usuario_por_id(id)

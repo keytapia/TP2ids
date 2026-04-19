@@ -1,8 +1,11 @@
-#esto es solo de prueba para ver con python run.py si todo funciona y si Flask corre
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 main_bp = Blueprint("main", __name__)
 
+
+# --------------------- RUTA DE INICIO --------------------- #
 @main_bp.route("/", methods=["GET"])
 def inicio():
-    return "Hello word"
+    return jsonify({
+        "message": "La API está funcionando joya"
+    }), 200

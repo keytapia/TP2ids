@@ -1,23 +1,10 @@
 from app.db import db
 from app.models.usuario import usuario
-#import re (no se si hay que ponerlo para que funcione)
+from app.models.usuario import usuario
 import re
 
-from app.db import db
-from app.models.usuario import usuario
 
-#DELETE
-
-def eliminar_usuario(id):
-    usuario_encontrado=usuario.query.get(id)
-    if not usuario_encontrado:
-        return 0
-    
-    db.session.delete(usuario_encontrado)
-    db.session.commit()
-
-    return 1
-
+# --------------------- CREAR USUARIO --------------------- #
 def crear_usuario(dato):
 
     if not dato.get('nombre'):
@@ -54,5 +41,19 @@ def crear_usuario(dato):
     nuevo_usuario = db.crear(nombre, email)
     return nuevo_usuario, 201
 
+
+# --------------------- BORRAR USUARIO --------------------- #
+def eliminar_usuario(id):
+    usuario_encontrado=usuario.query.get(id)
+    if not usuario_encontrado:
+        return 0
+    
+    db.session.delete(usuario_encontrado)
+    db.session.commit()
+
+    return 1
+
+
+# --------------------- OBTENER USUARIO POR ID --------------------- #
 def obtener_usuario_por_id(id_buscado):
     return usuario.query.get(id_buscado)
