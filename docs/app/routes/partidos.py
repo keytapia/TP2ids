@@ -23,76 +23,41 @@ def crear_partido():
     partidos_service.crear_partido(data)
     return {"message": "Partido creado exitosamente"}, 201
 
+# --------------------- LISTA PARTIDO POR ID --------------------- #
+@partidos_bp.route("/partidos/<int:id>", methods = ["GET"])
+def obtener_partido_por_id(id):
+    partido = partidos_service.obtener_partido_por_id(id)
+    if partido is None:
+        return {"Error": "Partido no encontrado"}, 404
+    
+    return jsonify(partido), 200
+
+#---------------------- ACTUALIZAR PARTIDOS --------------------- #
+@partidos_bp.route("/partidos/<int:id>", methods = ["PUT"])
+def remplazar_partido(id):
+    data = request.json
+    partidos_service.remplazar_partido(id, data)
+    return {"message": "Partido actualizado exitosamente"}, 200
+
+#---------------------- ACTUALIZAR PARCIALMENTE PARTIDOS --------------------- #
+#Estaba entre actualizar_parcialmente_partido o solo actualizar_partido #
+@partidos_bp.route("/partidos/<int:id>", methods = ["PATCH"])
+def actualizar_parcialmente_partido(id):
+    data = request.json
+    partidos_service.actualizar_parcialmente_partido(id, data)
+    return {"message": "Partido actualizado exitosamente"}, 200
 
 # --------------------- BORRAR PARTIDO --------------------- #
-@partidos_bp.route("/<int:id>", methods=["DELETE"])
+@partidos_bp.route("/partidos/<int:id>", methods=["DELETE"])
 def delete_partido(id):
-    try:
-        if id <= 0:
-            return jsonify({
-                "errors": [
-                    {
-                        "code": 400,
-                        "message": "Id invalido",
-                        "level": "error",
-                        "description": "El id debe ser mayor a 0"
-                    }
-                ]
-            }), 400
+    if id <= 0:
+            return {"error": "ID invalido"}, 400
+    resultado = partidos_service.delete_partido(id)
 
-        eliminado = eliminar_partido(id)
+    if resultado is False:
+            return {"error": "Partido no encontrado"}, 404
 
-        if eliminado == 0:
-            return jsonify({
-                "errors": [
-                    {
-                        "code": 404,
-                        "message": "Partido no encontrado",
-                        "level": "error",
-                        "description": f"No existe un partido con id {id}"
-                    }
-                ]
-            }), 404
-
-        return "", 204
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "errors": [
-                {
-                    "code": 500,
-                    "message": "Error interno del servidor",
-                    "level": "error",
-                    "description": str(e)
-                }
-            ]
-        }), 500
-
-
-# --------------------- OBTENER PARTIDO POR ID --------------------- #
-@partidos_bp.route("/<int:id>", methods = ["GET"])
-def get_partido(id):
-    p = obtener_partido_por_id(id)
-
-    if not p:
-        return jsonify({
-            "errors": [{
-                "code": 404,
-                "message": "No se encontró el partido. ",
-                "level": "error",
-                "description": f"El ID {id} no existe en la base de datos. "
-            }]
-        }), 404
+    if resultado is None:
+            return {"error": "Error al eliminar el partido"}, 500
     
-    return jsonify({
-        "id": p.id,
-        "equipo_local": p.equipo_local,
-        "equipo_visitante": p.equipo_visitante,
-        "fecha": p.fecha.strftime('%Y-%m-%d') if p.fecha else None,
-        "fase": p.fase,
-        "resultado": {
-            "local": p.goles_local,
-            "visitante": p.goles_visitante
-        } if p.goles_local is not None else None
-    }), 200
+    return {"message": "Partido eliminado exitosamente"}, 200

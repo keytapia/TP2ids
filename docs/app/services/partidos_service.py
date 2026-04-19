@@ -1,92 +1,60 @@
 from app.db import db
-from app.models.partido import partido
+from app.db import get_connection
 import re
 from datetime import datetime
 
+#--------------------- OBTENER LISTA PARTIDOS --------------------- #
+def obtener_lista_partidos():
+   connection = get_connection()
+
+   try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM partidos")
+            partidos = cursor.fetchall()
+        return partidos
+    finally:
+        connection.close()
+
+# --------------------- LISTA PARTIDO POR ID --------------------- #
+def obtener_partido_por_id(id):
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM partidos WHERE id = %s", (id,))
+            partido = cursor.fetchone()
+        return partido
+    finally:
+        connection.close()
 
 # --------------------- CREAR PARTIDO --------------------- #
 def crear_partido(dato):
-    local = dato.get('equipo_local')
-    visitante = dato.get('equipo_visitante')
-    fecha = dato.get('fecha')
-    fase = dato.get('fase')
-    goles_local = dato.get('goles_local')
-    goles_visitante = dato.get('goles_visitante')
-
-
-    if not dato.get('equipo_local'):
-        return [{
-            'code': 400,
-            'message': "Faltan campos obligatorios",
-            'level': 'error',
-            'description': 'El campo "equipo_local" no fue completado y es obligatorio'
-
-        }]
-
-    if not dato.get('equipo_visitante'):
-        return [{
-            'code': 400,
-            'message': "Faltan campos obligatorios",
-            'level': 'error',
-            'description': 'El campo "equipo_visitante" no fue completado y es obligatorio'
-
-        }]
-
-    if not dato.get('fecha'):
-        return [{
-            'code': 400,
-            'message': "Faltan campos obligatorios",
-            'level': 'error',
-            'description': 'El campo "fecha" no fue completado y es obligatorio'
-
-        }]
-
-    if not dato.get('fase'):
-        return [{
-            'code': 400,
-            'message': "Faltan campos obligatorios",
-            'level': 'error',
-            'description': 'El campo "fase" no fue completado y es obligatorio'
-
-        }]
-
-
-    if local == visitante:
-        return [{
-            'code': 400,
-            'message': "Equipos invalidos",
-            'level': 'error',
-            'description': 'no se pueden enfrentar los mismos equipos'
-        }]
-
-    def validacion_fecha(fecha):
-        try:
-            datetime.strptime(str(fecha), '%Y-%m-%d %H:%M:%S')
+    conection = get_connection()
+    try:
+        with conection.cursor() as cursor:
+            cursor.execute("""INSERT INTO partidos (equipo_local, equipo_visitante, fecha, fase) VALUES (%s, %s, %s, %s)""", (dato.get('equipo_local'), dato.get('equipo_visitante'), dato.get('fecha'), dato.get('fase')))
+            conection.commit()
             return True
-        except ValueError:
-            return False
-    if not validacion_fecha(fecha):
-        return [{
-            'code': 400,
-            'message': "Fecha invalida",
-            'level': 'error',
-            'description': 'Debe ser una fecha valida y tener el formato YYYY-MM-DD'
-        }]
+    except Exception as e:
+        print("Error al crear el partido:", e)
+        return None
+    finally:
+        conection.close()
 
-    def partido_existente(partido):
-        partido_posible =partido_existente = (partido.query.filter_by(local = dato.get('local'),visitante = dato.get('visitante'),fase = dato.get('fase')).first())
-        return partido_posible
-
-    if partido_existente(partido):
-        return [{
-            'code': 409,
-            'message': "partido existente",
-            'level': 'error',
-            'description': 'este partido ya se encuentra registrado en esta fase'
-        }]
-    nuevo_partido = db.crear(local, visitante, fecha, fase, goles_local, goles_visitante)
-    return nuevo_partido, 201
-
+#--------------------- ACTUALIZAR PARTIDO --------------------- #  
+def remplazar_partido(id, data):
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE partidos SET equipo_local = %s, equipo_visitante = %s, fecha = %s, fase = %s WHERE id = %s""", (data.get('equipo_local'), data.get('equipo_visitante'), data.get('fecha'), data.get('fase'), id))
+            if cursor.rowcount == 0:
+                return False
+        connection.commit()
+        return True
+    except Exception as e:
+        print("Error al actualizar el partido:", e)
+        return None
+    finally:
+        connection.close()
 
 # --------------------- ELIMINAR PARTIDO --------------------- #
 def eliminar_partido(id):
