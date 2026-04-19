@@ -3,7 +3,7 @@ USE prode_db;
 
 CREATE TABLE usuarios(
   id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VERCHAR(100) NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE predicciones (
   usuario_id INT NOT NULL,
   partido_id INT NOT NULL,
   pred_local INT NOT NULL,
-  ped_visitante INT NOT NULL
+  pred_visitante INT NOT NULL,
   
   CONSTRAINT unique_prediccion UNIQUE(usuario_id, partido_id),
   
