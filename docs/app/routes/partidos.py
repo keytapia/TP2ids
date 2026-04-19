@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, Blueprint
 from flask import Blueprint, jsonify, request
 from datetime import datetime
 
-from app.db import db
 from app.services import partidos_service
 from app.services.partidos_service import crear_partido
 from app.services.partidos_service import obtener_lista_partidos 
