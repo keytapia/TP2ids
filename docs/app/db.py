@@ -1,7 +1,7 @@
 import pymysql
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 
-deg get_connection():
+def get_connection():
     return pymysql.connect(
         host=DB_HOST,
         user=DB_USER,
