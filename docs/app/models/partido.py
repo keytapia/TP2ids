@@ -9,5 +9,5 @@ class partido(db.Model):
     equipo_visitante = db.Column(db.String(100), nullable=False)
     fecha = db.Column(db.DateTime, nullable=False)
     fase = db.Column(db.String(50), nullable=False)
-    goles_local = db.Column(db.int, nullable=True)
-    goles_visitante = db.Column(db.int, nullable=True)
+    goles_local = db.Column(db.Integer, nullable=True)
+    goles_visitante = db.Column(db.Integer, nullable=True)

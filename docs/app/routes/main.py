@@ -7,5 +7,5 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/", methods=["GET"])
 def inicio():
     return jsonify({
-        "message": "La API está funcionando joya"
+        "message": "La API esta funcionando joya"
     }), 200

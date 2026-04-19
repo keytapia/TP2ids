@@ -1,6 +1,8 @@
 from flask import Flask
 from app.db import db
-from app.routes.main import main_bp #conecta con docs/app/routes/main.py
+from app.routes.main import main_bp
+from app.routes.usuarios import usuarios_bp
+from app.routes.partidos import partidos_bp
 
 def create_app():
     app = Flask(__name__)
