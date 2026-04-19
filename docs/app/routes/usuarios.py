@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from TP2ids.docs.app.services import usuarios_service
+from app.services import usuarios_service
 from app.services.usuarios_service import crear_usuario
 from app.services.usuarios_service import actualizar_usuario
 from app.services.usuarios_service import delete_usuario
