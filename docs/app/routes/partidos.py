@@ -5,6 +5,10 @@ from datetime import datetime
 from app.db import db
 from app.services import partidos_service
 from app.services.partidos_service import crear_partido
+from app.services.partidos_service import obtener_lista_partidos 
+from app.services.partidos_service import remplazar_partido
+from app.services.partidos_service import actualizar_parcialmente_partido
+from app.services.partidos_service import actualizar_resultado_partido
 from app.services.partidos_service import eliminar_partido
 from app.services.partidos_service import obtener_partido_por_id
 

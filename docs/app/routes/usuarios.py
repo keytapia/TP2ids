@@ -3,8 +3,10 @@ from flask import Blueprint, jsonify, request
 from TP2ids.docs.app.services import usuarios_service
 from app.db import db
 from app.services.usuarios_service import crear_usuario
-from app.services.usuarios_service import eliminar_usuario
-from app.services.usuarios_service import obtener_usuario_por_id
+from app.services.usuarios_service import actualizar_usuario
+from app.services.usuarios_service import delete_usuario
+from app.services.usuarios_service import obtener_lista_usuarios
+from app.services.usuarios_service import usuario_por_id
 
 usuarios_bp = Blueprint("usuarios", __name__)
 
