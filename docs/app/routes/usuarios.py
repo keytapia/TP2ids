@@ -5,7 +5,7 @@ from app.db import db
 
 usuarios_bp = Blueprint("usuarios", __name__)
 
-#DELETE
+# BORRAR USUARIO
 @usuarios_bp.route("/<int:id>", methods=["DELETE"])
 def delete_usuario(id):
     try:
@@ -53,13 +53,8 @@ def delete_usuario(id):
         }
         return jsonify(error), 500
 
-from flask import Flask, request, jsonify, Blueprint
-from app.services.usurios_service import crear_usuario, obtener_usuario_por_id
-from app.db import db
 
-usuarios_bp = Blueprint("usuarios", __name__)
-
-
+# CREAR USUARIO
 @usuarios_bp.route("/usuarios", methods=["POST"])
 def crear_usuario():
     dato = request.get_json()
@@ -78,6 +73,7 @@ def crear_usuario():
         return jsonify(error)
     return jsonify(nuevo_usuario, 201)
 
+# OBTENER USUARIO POR ID
 @usuarios_bp.route("/<int:id>", methods=["GET"])
 def get_usuario(id):
     u = obtener_usuario_por_id(id)
