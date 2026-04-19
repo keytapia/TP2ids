@@ -6,7 +6,7 @@ main_bp = Blueprint("main", __name__)
 # --------------------- RUTA DE INICIO --------------------- #
 @main_bp.route("/", methods=["GET"])
 def inicio():
-    return "Hello word"
+    return "La API Funciona!!!"
 
 #PARTIDOS
 @main_bp.route("/partidos", methods=["GET"])
