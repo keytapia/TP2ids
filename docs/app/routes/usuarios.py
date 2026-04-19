@@ -7,93 +7,34 @@ from app.services.usuarios_service import obtener_usuario_por_id
 
 usuarios_bp = Blueprint("usuarios", __name__)
 
+# ---------------------- LISTA USUARIOS --------------------- #
+@usuarios_bp.route("/usuarios", methods=["GET"])
+def lista_usuarios():
+    usuarios = usuarios_service.obtener_lista_usuarios()
+    return jsonify(usuarios)
 
 # --------------------- CREAR USUARIO --------------------- #
 @usuarios_bp.route("/usuarios", methods=["POST"])
 def crear_usuario():
-    dato = request.get_json()
-    nuevo_usuario = crear_usuario(dato)
-    if "error" in nuevo_usuario:
-        error = {
-            "errors": [
-                {
-                    "code": nuevo_usuario.get("code.api"),
-                    "message": crear_usuario.get("error"),
-                    "level": "error",
-                    "descripcion": crear_usuario.get("description")
-                }
-            ]
-        }
-        return jsonify(error)
-    return jsonify(nuevo_usuario, 201)
+    data = request.json
+    usuarios_service.crear_usuario(data)
+    return jsonify({"message": "Usuario creado exitosamente"}), 200
 
+# ---------------------- BUSCA USUARIO POR ID --------------------- # FALTA VALIDACION DE ID Y DE USUARIO EXISTENTE (error 404)
+@usuarios_bp.route("/usuarios/<int:id>", methods=["GET"])
+def usuario_por_id(id):
+    usuario = usuarios_service.usuario_por_id(id)
+    return jsonify(usuario)
 
-# --------------------- BORRAR USUARIO --------------------- #
+#---------------------- ACTUALIZAR USUARIO --------------------- #
+@usuarios_bp.route("/usuarios/<int:id>", methods=["PUT"])
+def actualizar_usuario(id):
+    data = request.json
+    usuarios_service.actualizar_usuario(id, data)
+    return {"message": "Usuario actualizado exitosamente"}, 200
+
+# --------------------- BORRAR USUARIO --------------------- # FALTA VALIDACION DE ID Y DE USUARIO EXISTENTE (error 400, 500, 404)
 @usuarios_bp.route("/<int:id>", methods=["DELETE"])
 def delete_usuario(id):
-    try:
-        if id <= 0:
-            error = {
-                "errors": [
-                    {
-                        "code": 400,
-                        "message": "Id invalido",
-                        "level": "error",
-                        "description": "El id debe ser mayor a 0"
-                    }
-                ]
-            }
-            return jsonify(error), 400
-
-        eliminado = eliminar_usuario(id)
-
-        if eliminado == 0:
-            error = {
-                "errors": [
-                    {
-                        "code": 404,
-                        "message": "Usuario no encontrado",
-                        "level": "error",
-                        "description": f"No existe un usuario con id {id}"
-                    }
-                ]
-            }
-            return jsonify(error), 404
-
-        return "", 204
-
-    except Exception as e:
-        db.session.rollback()
-        error = {
-            "errors": [
-                {
-                    "code": 500,
-                    "message": "Error interno del servidor",
-                    "level": "error",
-                    "description": str(e)
-                }
-            ]
-        }
-        return jsonify(error), 500
-
-
-# --------------------- OBTENER USUARIO POR ID --------------------- #
-@usuarios_bp.route("/<int:id>", methods=["GET"])
-def get_usuario(id):
-    u = obtener_usuario_por_id(id)
-
-    if not u: 
-        return jsonify({ 
-            "errors": [{ 
-                "code": 404, 
-                "message": "Usuario no encontrado",
-                "level": "error",
-                "description": f"No existe un usuario con el ID {id}." 
-            }] 
-        }), 404
-
-    return jsonify({ 
-        "id": u.id, 
-        "nombre": u.nombre,
-        "email": u.email
-    }), 200
+   usuarios_service.delete_usuario(id)
+   return {"message": "Usuario eliminado exitosamente"}, 200

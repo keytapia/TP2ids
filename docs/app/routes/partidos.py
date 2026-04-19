@@ -61,3 +61,10 @@ def delete_partido(id):
             return {"error": "Error al eliminar el partido"}, 500
     
     return {"message": "Partido eliminado exitosamente"}, 200
+
+#--------------------- RESULTADO PARTIDO POR ID --------------------- #
+@partidos_bp.route("/partidos/<int:id>/resultado", methods=["PUT"])
+def actualizar_resultado_partido(id):
+    data = request.json
+    partidos_service.actualizar_resultado_partido(id, data)
+    return {"message": "Resultado del partido actualizado exitosamente"}, 200

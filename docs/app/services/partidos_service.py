@@ -5,9 +5,9 @@ from datetime import datetime
 
 #--------------------- OBTENER LISTA PARTIDOS --------------------- #
 def obtener_lista_partidos():
-   connection = get_connection()
+    connection = get_connection()
 
-   try:
+    try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM partidos")
             partidos = cursor.fetchall()
@@ -56,18 +56,74 @@ def remplazar_partido(id, data):
     finally:
         connection.close()
 
+#--------------------- ACTUALIZAR PARCIALMENTE PARTIDO --------------------- #
+def actualizar_parcialmente_partido(id, data):
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            fields = []
+            values = []
+            
+            if 'equipo_local' in data:
+                fields.append("equipo_local = %s")
+                values.append(data.get('equipo_local'))
+            if 'equipo_visitante' in data:
+                fields.append("equipo_visitante = %s")
+                values.append(data.get('equipo_visitante'))
+            if 'fecha' in data:
+                fields.append("fecha = %s")
+                values.append(data.get('fecha'))
+            if 'fase' in data:
+                fields.append("fase = %s")
+                values.append(data.get('fase')) 
+
+            if not fields:
+                return False #Nada para actualizar
+            query =  f"""UPDATE partidos SET {', '.join(fields)} WHERE id = %s"""
+            values.append(id)
+            cursor.execute(query, tuple(values))
+
+            if cursor.rowcount == 0:
+                return False #No se encontró el partido
+            
+        connection.commit()
+        return True
+    except Exception as e:
+        print("Error al actualizar el partido:", e)
+        return None
+    finally:
+        connection.close()
+
 # --------------------- ELIMINAR PARTIDO --------------------- #
 def eliminar_partido(id):
-    partido_encontrado=partido.query.get(id)
-    if not partido_encontrado:
-        return 0
-    
-    db.session.delete(partido_encontrado)
-    db.session.commit()
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM partidos WHERE id = %s", (id,))
+            if cursor.rowcount == 0:
+                return False #No se encontró el partido
+            
+        connection.commit()
+        return True
+    except Exception as e:
+        print("Error al eliminar el partido:", e)
+        return None
+    finally:
+        connection.close()
 
-    return 1
-
-
-# --------------------- OBTENER PARTIDO POR ID --------------------- #
-def obtener_partido_por_id(id_buscado):
-    return partido.query.get(id_buscado)
+# --------------------- RESULTADO PARTIDO POR ID --------------------- #
+def actualizar_resultado_partido(id, data):
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE partidos SET goles_local = %s, goles_visitante = %s WHERE id = %s""", (data.get('goles_local'), data.get('goles_visitante'), id))
+            if cursor.rowcount == 0:
+                return False #No se encontró el partido
+            
+        connection.commit()
+        return True
+    except Exception as e:
+        print("Error al actualizar el resultado del partido:", e)
+        return None
+    finally:
+        connection.close()
