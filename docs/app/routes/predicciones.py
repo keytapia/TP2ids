@@ -7,9 +7,9 @@ from app.services.partidos_service import crear_partido
 from app.services.partidos_service import eliminar_partido
 from app.services.partidos_service import obtener_partido_por_id
 
-partidos_bp = Blueprint("partidos", __name__)
+predicciones_bp = Blueprint("predicciones", __name__)
 
-@partidos_bp.route("/partidos/<int:id>/prediccion", methods = ["POST"])
+@predicciones_bp.route("/partidos/<int:id>/prediccion", methods = ["POST"])
 def crear_prediccion(id):
     data = request.json
     partidos_service.crear_prediccion(id, data)
