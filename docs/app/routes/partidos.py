@@ -1,31 +1,27 @@
 from flask import Flask, request, jsonify, Blueprint
+from flask import Blueprint, jsonify, request
+from datetime import datetime
 
 from app.db import db
+from app.services import partidos_service
 from app.services.partidos_service import crear_partido
 from app.services.partidos_service import eliminar_partido
 from app.services.partidos_service import obtener_partido_por_id
 
 partidos_bp = Blueprint("partidos", __name__)
 
+#---------------------  LISTA PARTIDOS --------------------- #
+@partidos_bp.route("/partidos", methods = ["GET"])
+def lista_partidos():
+    partidos = partidos_service.obtener_lista_partidos()
+    return jsonify(partidos)
 
 # --------------------- CREAR PARTIDO --------------------- #
 @partidos_bp.route("/partidos", methods = ['POST'])
 def crear_partido():
-    dato = request.get_json()
-    nuevo_partido = crear_partido(dato)
-    if "error" in nuevo_partido:
-        error = {
-            "errors": [
-                {
-                    "code": nuevo_partido.get("code.api"),
-                    "message": nuevo_partido.get("error"),
-                    "level": "error",
-                    "descripcion": nuevo_partido.get("description")
-                }
-            ]
-        }
-        return jsonify(error)
-    return jsonify(nuevo_partido, 201)
+    data = request.json
+    partidos_service.crear_partido(data)
+    return {"message": "Partido creado exitosamente"}, 201
 
 
 # --------------------- BORRAR PARTIDO --------------------- #
