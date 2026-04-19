@@ -3,6 +3,8 @@ from app.models.partido import partido
 import re
 from datetime import datetime
 
+
+# --------------------- CREAR PARTIDO --------------------- #
 def crear_partido(dato):
     local = dato.get('equipo_local')
     visitante = dato.get('equipo_visitante')
@@ -86,11 +88,7 @@ def crear_partido(dato):
     return nuevo_partido, 201
 
 
-def obtener_partido_por_id(id_buscado):
-    return partido.query.get(id_buscado)
-
-"""DELETE"""
-
+# --------------------- ELIMINAR PARTIDO --------------------- #
 def eliminar_partido(id):
     partido_encontrado=partido.query.get(id)
     if not partido_encontrado:
@@ -100,3 +98,8 @@ def eliminar_partido(id):
     db.session.commit()
 
     return 1
+
+
+# --------------------- OBTENER PARTIDO POR ID --------------------- #
+def obtener_partido_por_id(id_buscado):
+    return partido.query.get(id_buscado)
