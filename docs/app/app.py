@@ -9,5 +9,7 @@ def create_app():
     db.init_app(app)
     
     app.register_blueprint(main_bp)
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(partidos_bp)
     
     return app

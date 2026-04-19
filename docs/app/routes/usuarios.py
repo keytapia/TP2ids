@@ -1,9 +1,9 @@
 
-rom flask import Blueprint, jsonify
+from flask import Blueprint, jsonify
 from app.services.usuarios_service import eliminar_usuario
 from app.db import db
 
-usuarios_bp = Blueprint("usuarios", _name_)
+usuarios_bp = Blueprint("usuarios", __name__)
 
 #DELETE
 @usuarios_bp.route("/<int:id>", methods=["DELETE"])

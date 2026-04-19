@@ -38,7 +38,7 @@ Seguí estos pasos para ejecutar la API en tu entorno local:
     `cd TP2ids`  
 2.  **Creá un entorno virtual**:  
     *Creamos el entorno virtual venv en una carpeta oculta llamada "venv":*  
-    `python -m venv .venv`  
+    `python3 -m venv .venv`  
     *Activamos el entorno virtual:*  
     - En Windows: `.venv\Scripts\activate`  
     - En macOS/Linux: `source .venv/bin/activate`  
@@ -49,7 +49,7 @@ Seguí estos pasos para ejecutar la API en tu entorno local:
 
 ## Cómo ejecutar la API
 
-Abrí tu terminal en la carpeta del proyecto (y con el virtual activado), y ejecutá el siguiente comando:
+Abrí tu terminal en la carpeta del proyecto (y con el entorno virtual activado), y ejecutá el siguiente comando:
 
 `flask run`
 
