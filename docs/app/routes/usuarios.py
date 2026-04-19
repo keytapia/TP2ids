@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 
+from TP2ids.docs.app.services import usuarios_service
 from app.db import db
 from app.services.usuarios_service import crear_usuario
 from app.services.usuarios_service import eliminar_usuario
@@ -20,10 +21,12 @@ def crear_usuario():
     usuarios_service.crear_usuario(data)
     return jsonify({"message": "Usuario creado exitosamente"}), 200
 
-# ---------------------- BUSCA USUARIO POR ID --------------------- # FALTA VALIDACION DE ID Y DE USUARIO EXISTENTE (error 404)
+# ---------------------- BUSCA USUARIO POR ID --------------------- # 
 @usuarios_bp.route("/usuarios/<int:id>", methods=["GET"])
 def usuario_por_id(id):
     usuario = usuarios_service.usuario_por_id(id)
+    if usuario is None:
+        return {"Error": "Usuario no encontrado"}, 404
     return jsonify(usuario)
 
 #---------------------- ACTUALIZAR USUARIO --------------------- #
@@ -33,8 +36,16 @@ def actualizar_usuario(id):
     usuarios_service.actualizar_usuario(id, data)
     return {"message": "Usuario actualizado exitosamente"}, 200
 
-# --------------------- BORRAR USUARIO --------------------- # FALTA VALIDACION DE ID Y DE USUARIO EXISTENTE (error 400, 500, 404)
+# --------------------- BORRAR USUARIO --------------------- # 
 @usuarios_bp.route("/<int:id>", methods=["DELETE"])
 def delete_usuario(id):
-   usuarios_service.delete_usuario(id)
-   return {"message": "Usuario eliminado exitosamente"}, 200
+    if id <= 0:
+        return {"error": "ID invalido"}, 400
+    resultado = usuarios_service.delete_usuario(id)
+
+    if resultado is False:
+        return {"error": "Usuario no encontrado"}, 404
+
+    if resultado is None:
+        return {"error": "Error al eliminar el usuario"}, 500
+    return {"message": "Usuario eliminado exitosamente"}, 200
