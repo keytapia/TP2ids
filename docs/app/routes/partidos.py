@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, Blueprint
-from flask import Blueprint, jsonify, request
 from datetime import datetime
 
 from app.services import partidos_service
